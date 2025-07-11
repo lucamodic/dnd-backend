@@ -4,7 +4,7 @@
     "activityBar.background": "#5772cb",
     "activityBar.foreground": "#FFFFFF",
     "activityBar.inactiveForeground": "#FFFFFF",
-    "activityBarBadge.background": "#424B80",
+    "activityBarBadge.background": "#5772cb",
     "activityBarBadge.foreground": "#B3B9E6",
     "commandCenter.border": "#FFFFFF",
     "sash.hoverBorder": "#5772cb",
@@ -15,7 +15,7 @@
     "statusBarItem.remoteForeground": "#FFFFFF",
     "titleBar.activeBackground": "#5772cb",
     "titleBar.activeForeground": "#FFFFFF",
-    "titleBar.inactiveBackground": "#B3B9E6",
+    "titleBar.inactiveBackground": "#5772cb",
     "titleBar.inactiveForeground": "#FFFFFF"
   }
 }
