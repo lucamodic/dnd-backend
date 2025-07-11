@@ -1,3 +1,4 @@
+import supabase from "../../db"
 import Admin, { IAdmin } from "../../db/models/Admin"
 
 export class Repository {
@@ -5,12 +6,16 @@ export class Repository {
     return await Admin.create(data)
   }
 
+  static tableName = "admin"
+
   static async getByUsername(username: string) {
-    try {
-      const admin = await Admin.findOne({ username })
-      return admin ? { admin } : { error: "Admin not found", status: 404 }
-    } catch (error) {
-      return { error: "Database error", status: 400 }
+    const { data: admin, error } = await supabase.from(this.tableName).select("*").eq("username", username).single()
+
+    if (error) {
+      if (error.code === "PGRST116") return { error: "Admin not found", status: 404 }
+      return { error, status: 400 }
     }
+
+    return { admin }
   }
 }

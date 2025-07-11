@@ -1,43 +1,55 @@
-import Admin, { IAdmin } from "../../db/models/Admin"
+import supabase from "../../db"
+import { IAdmin } from "../../db/models/Admin"
 
 export class Repository {
+  static tableName = "admin"
+
   static async post(data: IAdmin) {
-    return Admin.create(data)
+    const { data: admin, error } = await supabase.from(this.tableName).insert(data).single()
+
+    if (error) return { error, status: 400 }
+    return { admin }
   }
 
   static async patch(data: IAdmin) {
-    try {
-      const updatedAdmin = await Admin.findByIdAndUpdate(data.id, data, { new: true })
-      if (!updatedAdmin) {
-        return { error: "Admin not found", status: 404 }
-      }
-      return { updatedAdmin }
-    } catch (error) {
+    const { data: admin, error } = await supabase.from(this.tableName).update(data).eq("id", data.id).single()
+
+    if (error) {
+      if (error.code === "PGRST116") return { error: "Admin not found", status: 404 }
       return { error, status: 400 }
     }
+
+    return { admin }
   }
 
   static async delete(id: string) {
-    try {
-      const deletedAdmin = await Admin.findByIdAndDelete(id)
-      if (!deletedAdmin) {
-        return { error: "Admin not found", status: 404 }
-      }
-      return { message: "Admin deleted successfully" }
-    } catch (error) {
-      return { error, status: 400 }
-    }
+    const { data, error } = await supabase.from(this.tableName).delete().eq("id", id)
+
+    if (error) return { error, status: 400 }
+    if (!data) return { error: "Admin not found", status: 404 }
+
+    return { message: "Admin deleted successfully" }
   }
 
   static async getById(id: string) {
-    try {
-      const admin = await Admin.findById(id)
-      if (!admin) {
-        return { error: "Admin not found", status: 404 }
-      }
-      return { admin }
-    } catch (error) {
+    const { data: admin, error } = await supabase.from(this.tableName).select("*").eq("id", id).single()
+
+    if (error) {
+      if (error.code === "PGRST116") return { error: "Admin not found", status: 404 }
       return { error, status: 400 }
     }
+
+    return { admin }
+  }
+
+  static async getByUsername(username: string) {
+    const { data: admin, error } = await supabase.from(this.tableName).select("*").eq("username", username).single()
+
+    if (error) {
+      if (error.code === "PGRST116") return { error: "Admin not found", status: 404 }
+      return { error: "Database error", status: 400 }
+    }
+
+    return { admin }
   }
 }

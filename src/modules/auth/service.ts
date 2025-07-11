@@ -18,8 +18,8 @@ export class Service {
 
       if (!(await this.comparePasswords(data.password || "", admin.admin?.password || ""))) throw { error: "Credenciales incorrectas", status: 400 }
 
-      const token = jwt.sign({ id: admin.admin?._id }, process.env.JWT_SECRET || "", { expiresIn: "1d" })
-      const refreshToken = jwt.sign({ id: admin.admin?._id }, process.env.JWT_SECRET || "", { expiresIn: "7d" })
+      const token = jwt.sign({ id: admin.admin?.id }, process.env.JWT_SECRET || "", { expiresIn: "1d" })
+      const refreshToken = jwt.sign({ id: admin.admin?.id }, process.env.JWT_SECRET || "", { expiresIn: "7d" })
 
       return { status: 200, data: { token, refreshToken } }
     } catch (error: any) {

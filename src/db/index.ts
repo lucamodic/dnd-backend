@@ -1,18 +1,12 @@
-import mongoose from 'mongoose';
+import { createClient } from "@supabase/supabase-js"
 
-const uri: string | undefined = process.env.DB_URL;
+const supabaseUrl = process.env.SUPABASE_URL
+const supabaseKey = process.env.SUPABASE_ANON_KEY
 
-mongoose.set('strictQuery', false);
-
-async function connect(): Promise<void> {
-  if (!uri) {
-    throw new Error('DB_URL is not defined');
-  }
-  try {
-    await mongoose.connect(uri);
-  } catch (error) {
-    throw error;
-  }
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error("❌ Supabase URL or Key is missing from environment variables")
 }
 
-export default connect;
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+export default supabase
