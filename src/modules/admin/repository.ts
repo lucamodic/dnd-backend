@@ -1,55 +1,26 @@
-import supabase from "../../db"
+import { SupabaseRepo } from "../../utils/supabase"
 import { IAdmin } from "../../db/models/Admin"
 
+const repo = new SupabaseRepo("admin")
+
 export class Repository {
-  static tableName = "admin"
-
   static async post(data: IAdmin) {
-    const { data: admin, error } = await supabase.from(this.tableName).insert(data).single()
-
-    if (error) return { error, status: 400 }
-    return { admin }
+    return await repo.insert<IAdmin>(data)
   }
 
   static async patch(data: IAdmin) {
-    const { data: admin, error } = await supabase.from(this.tableName).update(data).eq("id", data.id).single()
-
-    if (error) {
-      if (error.code === "PGRST116") return { error: "Admin not found", status: 404 }
-      return { error, status: 400 }
-    }
-
-    return { admin }
+    return await repo.update({ id: data.id }, data)
   }
 
   static async delete(id: string) {
-    const { data, error } = await supabase.from(this.tableName).delete().eq("id", id)
-
-    if (error) return { error, status: 400 }
-    if (!data) return { error: "Admin not found", status: 404 }
-
-    return { message: "Admin deleted successfully" }
+    return await repo.delete({ id })
   }
 
   static async getById(id: string) {
-    const { data: admin, error } = await supabase.from(this.tableName).select("*").eq("id", id).single()
-
-    if (error) {
-      if (error.code === "PGRST116") return { error: "Admin not found", status: 404 }
-      return { error, status: 400 }
-    }
-
-    return { admin }
+    return await repo.findOneBy({ id })
   }
 
   static async getByUsername(username: string) {
-    const { data: admin, error } = await supabase.from(this.tableName).select("*").eq("username", username).single()
-
-    if (error) {
-      if (error.code === "PGRST116") return { error: "Admin not found", status: 404 }
-      return { error: "Database error", status: 400 }
-    }
-
-    return { admin }
+    return await repo.findOneBy({ username })
   }
 }
