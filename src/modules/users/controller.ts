@@ -8,10 +8,11 @@ function checkForAdminSecret(req: Request): boolean {
   const secret = req.headers["admin-secret"]
   return secret === adminSecret
 }
+
 export class Controller {
   static async post(req: Request, res: Response) {
-    if (!checkForAdminSecret(req)) {
-      return res.status(401).json({ error: "Invalid admin secret" })
+    if (checkForAdminSecret(req)) {
+      req.body.role = "admin";
     }
     return sendResponse(res, await Service.post(req.body))
   }

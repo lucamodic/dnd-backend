@@ -1,14 +1,14 @@
+import { IUser } from "../../db/models/User"
 import { SupabaseRepo } from "../../utils/supabase"
-import { IAdmin } from "../../db/models/Admin"
 
-const repo = new SupabaseRepo("admin")
+const repo = new SupabaseRepo("user")
 
 export class Repository {
-  static async post(data: IAdmin) {
-    return await repo.insert<IAdmin>(data)
+  static async post(data: IUser) {
+    return await repo.insert<IUser>(data)
   }
 
-  static async patch(data: IAdmin) {
+  static async patch(data: IUser) {
     return await repo.update({ id: data.id }, data)
   }
 

@@ -1,14 +1,14 @@
-import Admin, { IAdmin } from "../../db/models/Admin"
-import { SupabaseRepo } from "../../utils/supabase"
+import User, { IUser } from "../../db/models/User";
+import { SupabaseRepo } from "../../utils/supabase";
 
-const adminRepo = new SupabaseRepo("admin")
+const userRepo = new SupabaseRepo("user");
 
 export class Repository {
-  static async post(data: IAdmin) {
-    return await Admin.create(data)
+  static async post(data: IUser) {
+    return await User.create(data);
   }
 
   static async getByUsername(username: string) {
-    return await adminRepo.findOneBy({ username })
+    return await userRepo.findOneBy({ username });
   }
 }

@@ -1,2 +1,3 @@
 export * from "./auth/route"
-export * from "./admin/route"
+export * from "./users/route"
+export * from "./monsters/route"

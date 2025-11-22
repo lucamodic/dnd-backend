@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000
 
 async function startServer() {
   try {
-    const { error } = await supabase.from("admin").select("id").limit(1)
+    const { error } = await supabase.from("user").select("id").limit(1)
     if (error) throw error
 
     console.log("✅ Connected to Supabase")
