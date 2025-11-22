@@ -12,6 +12,7 @@ export interface ICharacter extends Document {
   campaignId?: string;
   playerId?: string;
   createdAt: Date;
+  classId?: string;
 }
 
 const characterSchema = new Schema<ICharacter>({
@@ -26,6 +27,7 @@ const characterSchema = new Schema<ICharacter>({
   campaignId: { type: String },
   playerId: { type: String },
   createdAt: { type: Date, default: Date.now },
+  classId: { type: String },
 });
 
 const Character: Model<ICharacter> =
