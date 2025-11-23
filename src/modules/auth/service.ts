@@ -1,15 +1,21 @@
-import crypto from "crypto";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Repository } from "./repository";
 import { IUser } from "../../db/models/User";
-import { sendEmail } from "../../utils/email";
+import {
+  buildTokens,
+  comparePasswords,
+  generateVerificationMetadata,
+  hashPassword,
+  sendVerificationEmail,
+} from "./utils";
 
 type ServiceResponse = { status: number; error?: string; data?: any };
 type RefreshTokenResponse = { token: string; refreshToken: string };
 
 export class Service {
-  static async post(data: IUser): Promise<ServiceResponse | RefreshTokenResponse> {
+  static async post(
+    data: IUser
+  ): Promise<ServiceResponse | RefreshTokenResponse> {
     try {
       if (data.refreshToken) return this.refreshToken(data.refreshToken);
 
@@ -21,6 +27,7 @@ export class Service {
       const user = data.email
         ? await Repository.getByEmail(data.email)
         : await Repository.getByUsername(data.username || "");
+
       if (!user || "error" in user) {
         throw { error: "Invalid credentials", status: 400 };
       }
@@ -29,22 +36,29 @@ export class Service {
         throw { error: "Email not verified", status: 403 };
       }
 
-      if (!(await this.comparePasswords(data.password || "", user?.password || ""))) {
+      if (
+        !(await comparePasswords(data.password || "", user?.password || ""))
+      ) {
         throw { error: "Invalid credentials", status: 400 };
       }
 
-      const tokens = this.buildTokens(user.id as string);
+      const tokens = buildTokens(user.id as string);
       return { status: 200, data: tokens };
     } catch (error: any) {
-      return "status" in error ? error : { status: 400, error: "Authentication failed" };
+      return "status" in error
+        ? error
+        : { status: 400, error: "Authentication failed" };
     }
   }
 
   static async signup(data: IUser): Promise<ServiceResponse> {
     try {
-      const { username, email, password } = data;
+      const { username, email, password, language } = data;
       if (!username || !email || !password) {
-        throw { status: 400, error: "username, email and password are required" };
+        throw {
+          status: 400,
+          error: "username, email and password are required",
+        };
       }
 
       const existingByUsername = await Repository.getByUsername(username);
@@ -57,9 +71,9 @@ export class Service {
         throw { status: 409, error: "Email already in use" };
       }
 
-      const hashedPassword = await this.hashPassword(password);
-      const verificationToken = crypto.randomBytes(24).toString("hex");
-      const verificationExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      const hashedPassword = await hashPassword(password);
+      const { verificationToken, email_verification_expires_at } =
+        generateVerificationMetadata();
 
       const payload: IUser = {
         username,
@@ -68,7 +82,8 @@ export class Service {
         role: "user",
         email_verified: false,
         email_verification_token: verificationToken,
-        email_verification_expires_at: verificationExpiresAt,
+        email_verification_expires_at,
+        language,
       };
 
       const created = await Repository.createUser(payload);
@@ -76,7 +91,7 @@ export class Service {
         throw { status: created.status ?? 400, error: created.error };
       }
 
-      await this.sendVerificationEmail(email, verificationToken);
+      await sendVerificationEmail(email, verificationToken, language);
 
       return {
         status: 201,
@@ -85,25 +100,10 @@ export class Service {
         },
       };
     } catch (error: any) {
-      return "status" in error ? error : { status: 400, error: "Signup failed" };
+      return "status" in error
+        ? error
+        : { status: 400, error: "Signup failed" };
     }
-  }
-
-  static async sendVerificationEmail(email: string, token: string) {
-    const baseUrl = process.env.FRONT_URL;
-    const url = baseUrl
-      ? `${baseUrl.replace(/\/$/, "")}/auth/confirm?token=${token}`
-      : `http://localhost:3000/auth/confirm?token=${token}`;
-
-    const subject = "Confirm your account";
-    const html = `<p>Hi!</p><p>Click to verify your email: <a href="${url}">${url}</a></p>`;
-
-    const result = await sendEmail({ to: email, subject, html, text: `Verify your email: ${url}` });
-    if (!result.sent) {
-      throw { status: 502, error: `Failed to send verification email: ${result.error}` };
-    }
-
-    return result;
   }
 
   static async verifyEmail(token: string): Promise<ServiceResponse> {
@@ -137,7 +137,7 @@ export class Service {
         throw { status: updated.status ?? 400, error: updated.error };
       }
 
-      const tokens = this.buildTokens(user.id as string);
+      const tokens = buildTokens(user.id as string);
       return {
         status: 200,
         data: {
@@ -146,31 +146,21 @@ export class Service {
         },
       };
     } catch (error: any) {
-      return "status" in error ? error : { status: 400, error: "Email verification failed" };
+      return "status" in error
+        ? error
+        : { status: 400, error: "Email verification failed" };
     }
   }
 
-  static buildTokens(id: string) {
-    const token = jwt.sign({ id }, process.env.JWT_SECRET || "", { expiresIn: "1d" });
-    const refreshToken = jwt.sign({ id }, process.env.JWT_SECRET || "", { expiresIn: "7d" });
-    return { token, refreshToken };
-  }
-
-  static async hashPassword(password: string) {
-    const secret = process.env.SECRET || "";
-    const saltRounds = 10;
-    return await bcrypt.hash(password + secret, saltRounds);
-  }
-
-  static async comparePasswords(password: string, hashedPassword: string) {
-    const secret = process.env.SECRET || "";
-    return await bcrypt.compare(password + secret, hashedPassword);
-  }
-
-  static async refreshToken(refreshToken: string): Promise<RefreshTokenResponse | ServiceResponse> {
+  static async refreshToken(
+    refreshToken: string
+  ): Promise<RefreshTokenResponse | ServiceResponse> {
     try {
-      const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET || "") as jwt.JwtPayload;
-      return this.buildTokens(decoded.id as string);
+      const decoded = jwt.verify(
+        refreshToken,
+        process.env.JWT_SECRET || ""
+      ) as jwt.JwtPayload;
+      return buildTokens(decoded.id as string);
     } catch (error) {
       return { error: (error as Error).message, status: 401 };
     }

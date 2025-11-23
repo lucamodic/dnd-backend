@@ -11,6 +11,8 @@ export interface IUser extends Document {
   refreshToken?: string;
   refresh_token?: string;
   role?: string;
+  language?: string;
+  locale?: string;
   createdAt: Date;
   created_at?: string;
 }
@@ -41,6 +43,12 @@ const userSchema: Schema = new Schema<IUser>({
   role: {
     type: String,
     default: "user",
+  },
+  language: {
+    type: String,
+  },
+  locale: {
+    type: String,
   },
   createdAt: {
     type: Date,
