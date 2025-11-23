@@ -5,6 +5,10 @@ import bcrypt from "bcrypt"
 
 export class Service {
   static async post(data: IUser) {
+    if (!data.email) {
+      return { status: 400, error: "Email is required" }
+    }
+
     if (data.password) {
       const saltRounds = 10;
       const secret = process.env.SECRET || "";

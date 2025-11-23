@@ -13,6 +13,7 @@ export class Controller {
   static async post(req: Request, res: Response) {
     if (checkForAdminSecret(req)) {
       req.body.role = "admin";
+      req.body.email_verified = true;
     }
     return sendResponse(res, await Service.post(req.body))
   }
