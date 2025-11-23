@@ -4,8 +4,8 @@ import { SupabaseRepo } from "../../utils/supabase";
 const userRepo = new SupabaseRepo("user");
 
 export class Repository {
-  static async createUser(data: IUser) {
-    return await userRepo.insert<IUser>(data);
+  static async createUser(data: Partial<IUser>) {
+    return await userRepo.insert<Partial<IUser>>(data);
   }
 
   static async getByUsername(username: string) {
@@ -21,6 +21,6 @@ export class Repository {
   }
 
   static async updateUser(filter: Record<string, any>, data: Partial<IUser>) {
-    return await userRepo.update<IUser>(filter, data);
+    return await userRepo.update<Partial<IUser>>(filter, data);
   }
 }

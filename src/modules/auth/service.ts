@@ -75,7 +75,7 @@ export class Service {
       const { verificationToken, email_verification_expires_at } =
         generateVerificationMetadata();
 
-      const payload: IUser = {
+      const payload: Partial<IUser> = {
         username,
         email,
         password: hashedPassword,
