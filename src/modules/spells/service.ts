@@ -6,6 +6,17 @@ import { DND_API_BASE_URL } from "../../utils/constants";
 import { ClassSpellRepository } from "./repository-class-spell";
 
 export class Service {
+  static async list() {
+    return Repository.list();
+  }
+
+  static async show(id: string) {
+    if (!id) {
+      return { status: 400, error: "Spell id is required" };
+    }
+    return Repository.getById(id);
+  }
+
   static async importAll() {
     const list = await axios.get(`${DND_API_BASE_URL}/api/spells`);
     const spells = list.data.results;

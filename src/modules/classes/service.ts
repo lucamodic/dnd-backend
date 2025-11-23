@@ -18,6 +18,17 @@ const CLASS_COLORS: Record<string, string> = {
 };
 
 export class Service {
+  static async list() {
+    return Repository.list();
+  }
+
+  static async show(id: string) {
+    if (!id) {
+      return { status: 400, error: "Class id is required" };
+    }
+    return Repository.getById(id);
+  }
+
   static async importAll() {
     const list = await axios.get(`${DND_API_BASE_URL}/api/classes`);
     const classes = list.data.results;

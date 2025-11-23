@@ -37,6 +37,7 @@ export interface IMonster extends Document {
   reactions?: any;
 
   image?: string;
+  userId?: string;
   createdAt: Date;
 }
 
@@ -71,6 +72,7 @@ const monsterSchema = new Schema<IMonster>({
   legendary_actions: { type: Schema.Types.Mixed },
   reactions: { type: Schema.Types.Mixed },
   image: { type: String },
+  userId: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 

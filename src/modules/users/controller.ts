@@ -10,6 +10,14 @@ function checkForAdminSecret(req: Request): boolean {
 }
 
 export class Controller {
+  static async list(req: Request, res: Response) {
+    return sendResponse(res, await Service.list());
+  }
+
+  static async get(req: Request, res: Response) {
+    return sendResponse(res, await Service.getById(req.params.id));
+  }
+
   static async post(req: Request, res: Response) {
     if (checkForAdminSecret(req)) {
       req.body.role = "admin";
