@@ -1,0 +1,283 @@
+{
+	"info": {
+		"_postman_id": "50427f21-2d84-49cf-898c-a6c597d48541",
+		"name": "DnD",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37958219"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "admin-secret",
+								"value": "bd26f849833a5084dd6162c680ac64907eb227cf49ba2f65695d1d529b78a2de!@asdlkam21azx",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"insomnya\",\r\n    \"password\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminFolder}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminFolder}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Monster",
+			"item": [
+				{
+					"name": "Import",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "admin-secret",
+								"value": "bd26f849833a5084dd6162c680ac64907eb227cf49ba2f65695d1d529b78a2de!@asdlkam21azx",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"insomnya\",\r\n    \"password\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminFolder}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminFolder}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Classes",
+			"item": [
+				{
+					"name": "Import",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "admin-secret",
+								"value": "bd26f849833a5084dd6162c680ac64907eb227cf49ba2f65695d1d529b78a2de!@asdlkam21azx",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"insomnya\",\r\n    \"password\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminFolder}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminFolder}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Spells",
+			"item": [
+				{
+					"name": "Import",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "admin-secret",
+								"value": "bd26f849833a5084dd6162c680ac64907eb227cf49ba2f65695d1d529b78a2de!@asdlkam21azx",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"insomnya\",\r\n    \"password\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{adminFolder}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{adminFolder}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"insomnya\",\r\n    \"password\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{authFolder}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{authFolder}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SignUp",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"insomnya\",\r\n    \"password\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{authFolder}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{authFolder}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"insomnya\",\r\n    \"password\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{authFolder}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{authFolder}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "adminFolder",
+			"value": "admin",
+			"type": "default"
+		},
+		{
+			"key": "classesFolder",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "authFolder",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "spellFolder",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "userFolder",
+			"value": "user",
+			"type": "default"
+		},
+		{
+			"key": "monstersFolder",
+			"value": "monsters",
+			"type": "default"
+		},
+		{
+			"key": "authFolder",
+			"value": "auth",
+			"type": "default"
+		}
+	]
+}
