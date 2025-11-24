@@ -2,7 +2,6 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface ICharacter extends Document {
   name: string;
-  player?: string;
   pdf?: string;
   ac?: number;
   hp?: number;
@@ -13,11 +12,11 @@ export interface ICharacter extends Document {
   playerId?: string;
   createdAt: Date;
   classId?: string;
+  userId?: string;
 }
 
 const characterSchema = new Schema<ICharacter>({
   name: { type: String, required: true },
-  player: { type: String },
   pdf: { type: String },
   ac: { type: Number },
   hp: { type: Number },
@@ -28,6 +27,7 @@ const characterSchema = new Schema<ICharacter>({
   playerId: { type: String },
   createdAt: { type: Date, default: Date.now },
   classId: { type: String },
+  userId: { type: String },
 });
 
 const Character: Model<ICharacter> =

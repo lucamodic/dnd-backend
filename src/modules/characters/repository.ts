@@ -1,8 +1,9 @@
+import supabase from "../../db";
 import { CrudRepository } from "../../utils/crud-repository";
+import { mapList } from "../../utils/supabase-helpers";
 
 export type CharacterInsert = {
   name: string;
-  player?: string | null;
   pdf?: string | null;
   ac?: number | null;
   hp?: number | null;
@@ -12,6 +13,7 @@ export type CharacterInsert = {
   campaign_id?: string | null;
   player_id?: string | null;
   class_id?: string | null;
+  user_id?: string | null;
 };
 
 const CHARACTER_SELECT = `
@@ -38,6 +40,16 @@ export class Repository {
 
   static getById(id: string) {
     return repo.findById(id);
+  }
+
+  static async listByUser(userId: string) {
+    const { data, error } = await supabase
+      .from("character")
+      .select(CHARACTER_SELECT)
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    return mapList(data, error);
   }
 
   static create(data: CharacterInsert) {

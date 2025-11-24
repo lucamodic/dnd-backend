@@ -1,4 +1,6 @@
+import supabase from "../../db";
 import { CrudRepository } from "../../utils/crud-repository";
+import { mapList } from "../../utils/supabase-helpers";
 
 export type CampaignInsert = {
   title: string;
@@ -12,7 +14,7 @@ const CAMPAIGN_SELECT = `
   characters:character(
     *,
     player:player_id(*),
-    class:class_id(*)
+    class:class(*)
   ),
   encounters:campaign_monster(
     *,
@@ -41,8 +43,14 @@ export class Repository {
     return repo.findAll();
   }
 
-  static listByUser(userId: string) {
-    return repo.findManyBy("user_id", userId);
+  static async listByUser(userId: string) {
+    const { data, error } = await supabase
+      .from("campaign")
+      .select(CAMPAIGN_SELECT)
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    return mapList(data, error);
   }
 
   static getById(id: string) {

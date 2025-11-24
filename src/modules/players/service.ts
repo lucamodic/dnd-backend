@@ -13,8 +13,8 @@ const validateName = (name?: string | null) =>
     : { status: 400, error: "Player name is required" };
 
 export class Service {
-  static async list() {
-    return Repository.list();
+  static async list(userId?: string) {
+    return Repository.listVisible(userId);
   }
 
   static async show(id: string) {
@@ -23,12 +23,13 @@ export class Service {
     return Repository.getById(id);
   }
 
-  static async create(payload: Payload) {
+  static async create(payload: Payload, userId?: string) {
     const invalid = validateName(payload.name);
     if (invalid) return invalid;
 
     const insertion = await Repository.create({
       name: payload.name!.trim(),
+      user_id: userId ?? null,
     });
 
     if ("error" in insertion) {

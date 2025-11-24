@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
-type AuthorizationHeaderValue = string | Express.AuthorizationContext | undefined;
+type AuthorizationHeaderValue =
+  | string
+  | Express.AuthorizationContext
+  | undefined;
 
 const unauthorized = (res: Response, message = "Unauthorized") => {
   return res.status(401).json({ error: message });
@@ -9,9 +12,12 @@ const unauthorized = (res: Response, message = "Unauthorized") => {
 
 const normalizeHeader = (
   value: AuthorizationHeaderValue
-):
-  | { raw: string; scheme: string; token: string; claims?: Express.AuthorizationClaims }
-  | null => {
+): {
+  raw: string;
+  scheme: string;
+  token: string;
+  claims?: Express.AuthorizationClaims;
+} | null => {
   if (!value) return null;
 
   if (typeof value !== "string") {
@@ -29,7 +35,15 @@ const normalizeHeader = (
   return { raw, scheme: "Bearer", token: raw };
 };
 
-export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+export const requireAuth = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (req.method === "OPTIONS") {
+    return next();
+  }
+
   const header = normalizeHeader(req.headers.authorization);
   if (!header?.token) {
     return unauthorized(res, "Missing authorization token");
@@ -41,19 +55,20 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
   }
 
   try {
-    const claims = header.claims ?? (jwt.verify(header.token, secret) as Express.AuthorizationClaims);
-    const context: Express.AuthorizationContext = {
+    const claims =
+      header.claims ??
+      (jwt.verify(header.token, secret) as Express.AuthorizationClaims);
+
+    req.authorization = {
       raw: header.raw,
       scheme: header.scheme,
       token: header.token,
       claims,
     };
 
-    req.authorization = context;
-    (req.headers as Record<string, any>).authorization = context;
-
     return next();
   } catch (error) {
+    console.error("[requireAuth] Failed to verify token:", error);
     return unauthorized(res, "Invalid or expired token");
   }
 };

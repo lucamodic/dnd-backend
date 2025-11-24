@@ -2,11 +2,13 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IPlayer extends Document {
   name: string;
+  userId?: string;
   createdAt: Date;
 }
 
 const playerSchema = new Schema<IPlayer>({
   name: { type: String, required: true },
+  userId: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 

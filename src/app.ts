@@ -14,14 +14,58 @@ import {
   encountersRouter,
   encounterParticipantsRouter,
 } from "./modules/index";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import { requireAuth } from "./modules/auth/middleware";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+const configuredOrigins = process.env.CORS_ORIGINS || process.env.FRONT_URL || "";
+
+const defaultOrigins = ["http://localhost:8080", "http://localhost:3000"];
+
+const allowedOrigins = Array.from(
+  new Set(
+    [...configuredOrigins.split(","), ...defaultOrigins]
+      .map((origin) => origin.trim())
+      .filter(Boolean)
+  )
+);
+
+const corsOptions: CorsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    console.error("Rejected CORS origin:", origin);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+  );
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
+
 app.use("/auth", authRouter);
 app.use(requireAuth);
 app.use("/user", userRouter);

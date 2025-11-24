@@ -22,9 +22,12 @@ const resolveNumeric = (value: any) => {
   return Number.isNaN(num) ? null : num;
 };
 
-const buildPayload = (payload: Payload, playerId?: string): CharacterInsert => ({
+const buildPayload = (
+  payload: Payload,
+  playerId?: string,
+  ownerId?: string | null
+): CharacterInsert => ({
   name: payload.name!.trim(),
-  player: payload.playerName ?? payload.player ?? null,
   pdf: payload.pdf ?? null,
   ac: resolveNumeric(payload.ac),
   hp: resolveNumeric(payload.hp),
@@ -34,9 +37,10 @@ const buildPayload = (payload: Payload, playerId?: string): CharacterInsert => (
   campaign_id: payload.campaignId ?? payload.campaign_id ?? null,
   player_id: playerId ?? payload.player_id ?? null,
   class_id: payload.classId ?? payload.class_id ?? null,
+  user_id: ownerId ?? null,
 });
 
-const resolvePlayer = async (payload: Payload) => {
+const resolvePlayer = async (payload: Payload, ownerId?: string | null) => {
   if (payload.playerId !== undefined) {
     if (!payload.playerId?.trim()) {
       return { status: 400, error: "playerId cannot be empty" };
@@ -51,6 +55,7 @@ const resolvePlayer = async (payload: Payload) => {
   if (payload.playerName) {
     const playerResult = await PlayerRepository.create({
       name: payload.playerName.trim(),
+      user_id: ownerId ?? null,
     });
 
     if ("error" in playerResult) {
@@ -67,10 +72,14 @@ const resolvePlayer = async (payload: Payload) => {
 };
 
 export class Service {
-  static async list(campaignId?: string) {
-    return campaignId
-      ? Repository.listByCampaign(campaignId)
-      : Repository.list();
+  static async list(campaignId?: string, ownerId?: string) {
+    if (campaignId) {
+      return Repository.listByCampaign(campaignId);
+    }
+    if (ownerId) {
+      return Repository.listByUser(ownerId);
+    }
+    return Repository.list();
   }
 
   static async show(id: string) {
@@ -79,17 +88,17 @@ export class Service {
     return Repository.getById(id);
   }
 
-  static async create(payload: Payload) {
+  static async create(payload: Payload, ownerId?: string) {
     const invalid = ensureName(payload.name);
     if (invalid) return invalid;
 
-    const playerResult = await resolvePlayer(payload);
+    const playerResult = await resolvePlayer(payload, ownerId);
     if ("error" in playerResult) {
       return playerResult;
     }
 
     const insertion = await Repository.create(
-      buildPayload(payload, playerResult.playerId)
+      buildPayload(payload, playerResult.playerId, ownerId ?? null)
     );
 
     if ("error" in insertion) {
@@ -102,7 +111,7 @@ export class Service {
     return { status: 201, data: detail.data };
   }
 
-  static async update(id: string, payload: Payload) {
+  static async update(id: string, payload: Payload, ownerId?: string) {
     const invalid = ensureId(id);
     if (invalid) return invalid;
 
@@ -112,7 +121,7 @@ export class Service {
 
     let playerId: string | undefined;
     if (payload.playerId || payload.playerName) {
-      const resolved = await resolvePlayer(payload);
+      const resolved = await resolvePlayer(payload, ownerId);
       if ("error" in resolved) {
         return resolved;
       }
@@ -133,10 +142,6 @@ export class Service {
     if (payload.classId !== undefined) {
       updatePayload.class_id = payload.classId;
     }
-    if (payload.playerName !== undefined || payload.player !== undefined) {
-      updatePayload.player = payload.playerName ?? payload.player ?? null;
-    }
-
     if (playerId) {
       updatePayload.player_id = playerId;
     }

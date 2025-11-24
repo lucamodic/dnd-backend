@@ -40,6 +40,15 @@ const requireType = (type?: string) =>
 const normalizeName = (name?: string | null) =>
   name && name.trim().length ? name.trim() : undefined;
 
+const fetchCharacterWithStats = async (id: string) => {
+  const character = await CharacterRepository.getById(id);
+  if ("error" in character) return character;
+  const record = character.data as any;
+  const name = record?.name;
+  if (!name) return { status: 404, error: "Character not found" };
+  return { name: String(name), record };
+};
+
 const buildPayload = (
   payload: Payload,
   resolvedName: string
@@ -163,19 +172,46 @@ export class Service {
       };
     }
 
-    const resolvedName = await resolveName(payload, type);
-    if ("error" in resolvedName) return resolvedName;
+    let characterRecord: any | undefined;
+    let nameResult: { name: string } | { status: number; error: string };
 
-    const insertion = await Repository.create(
-      buildPayload(
-        {
-          ...payload,
-          participant_type: type,
-          name: resolvedName.name,
-        },
-        resolvedName.name
-      )
+    if (type === "character") {
+      const characterId = payload.characterId || payload.character_id;
+      const character = await fetchCharacterWithStats(characterId!);
+      if ("error" in character) return character;
+      characterRecord = character.record;
+      nameResult = { name: normalizeName(payload.name) ?? character.name };
+    } else {
+      nameResult = await resolveName(payload, type);
+    }
+
+    if ("error" in nameResult) return nameResult;
+
+    const basePayload = buildPayload(
+      {
+        ...payload,
+        participant_type: type,
+        name: nameResult.name,
+      },
+      nameResult.name
     );
+
+    if (type === "character" && characterRecord) {
+      if (basePayload.hp_current == null && characterRecord.hp !== undefined) {
+        basePayload.hp_current = characterRecord.hp ?? null;
+      }
+      if (basePayload.hp_max == null && characterRecord.hp !== undefined) {
+        basePayload.hp_max = characterRecord.hp ?? null;
+      }
+      if (
+        basePayload.armor_class == null &&
+        characterRecord.ac !== undefined
+      ) {
+        basePayload.armor_class = characterRecord.ac ?? null;
+      }
+    }
+
+    const insertion = await Repository.create(basePayload);
     if ("error" in insertion) return insertion;
 
     const detail = await Repository.getById((insertion.data as any).id);

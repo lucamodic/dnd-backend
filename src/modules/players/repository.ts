@@ -1,7 +1,10 @@
+import supabase from "../../db";
 import { CrudRepository } from "../../utils/crud-repository";
+import { mapList } from "../../utils/supabase-helpers";
 
 export type PlayerInsert = {
   name: string;
+  user_id?: string | null;
 };
 
 const PLAYER_SELECT = `
@@ -9,7 +12,7 @@ const PLAYER_SELECT = `
   characters:character(
     *,
     campaign:campaign_id(*),
-    class:class_id(*)
+    class:class(*)
   )
 `;
 
@@ -24,6 +27,20 @@ export class Repository {
 
   static getById(id: string) {
     return repo.findById(id);
+  }
+
+  static async listVisible(userId?: string) {
+    if (!userId) {
+      return repo.findAll();
+    }
+
+    const { data, error } = await supabase
+      .from("player")
+      .select(PLAYER_SELECT)
+      .or(`user_id.is.null,user_id.eq.${userId}`)
+      .order("created_at", { ascending: false });
+
+    return mapList(data, error);
   }
 
   static create(data: PlayerInsert) {

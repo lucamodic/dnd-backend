@@ -45,6 +45,7 @@ export class Service {
       const tokens = buildTokens(user.id as string);
       return { status: 200, data: tokens };
     } catch (error: any) {
+      console.error("[AuthService.post] error:", error);
       return "status" in error
         ? error
         : { status: 400, error: "Authentication failed" };
@@ -100,6 +101,7 @@ export class Service {
         },
       };
     } catch (error: any) {
+      console.error("[AuthService.signup] error:", error);
       return "status" in error
         ? error
         : { status: 400, error: "Signup failed" };
@@ -146,6 +148,7 @@ export class Service {
         },
       };
     } catch (error: any) {
+      console.error("[AuthService.verifyEmail] error:", error);
       return "status" in error
         ? error
         : { status: 400, error: "Email verification failed" };
@@ -162,6 +165,7 @@ export class Service {
       ) as jwt.JwtPayload;
       return buildTokens(decoded.id as string);
     } catch (error) {
+      console.error("[AuthService.refreshToken] error:", error);
       return { error: (error as Error).message, status: 401 };
     }
   }
