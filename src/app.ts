@@ -28,7 +28,7 @@ const configuredOrigins =
 const defaultOrigins = [
   "http://localhost:8080",
   "http://localhost:3000",
-  process.env.FRONT_URL!,
+  "https://dnd-chi-one.vercel.app",
 ];
 
 const allowedOrigins = Array.from(
