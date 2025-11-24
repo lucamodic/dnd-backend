@@ -22,9 +22,14 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-const configuredOrigins = process.env.CORS_ORIGINS || process.env.FRONT_URL || "";
+const configuredOrigins =
+  process.env.CORS_ORIGINS || process.env.FRONT_URL || "";
 
-const defaultOrigins = ["http://localhost:8080", "http://localhost:3000"];
+const defaultOrigins = [
+  "http://localhost:8080",
+  "http://localhost:3000",
+  process.env.FRONT_URL!,
+];
 
 const allowedOrigins = Array.from(
   new Set(
@@ -36,7 +41,11 @@ const allowedOrigins = Array.from(
 
 const corsOptions: CorsOptions = {
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
+    if (
+      !origin ||
+      allowedOrigins.includes("*") ||
+      allowedOrigins.includes(origin)
+    ) {
       return callback(null, true);
     }
 
