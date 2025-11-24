@@ -29,6 +29,7 @@ const defaultOrigins = [
   "http://localhost:8080",
   "http://localhost:3000",
   "https://dnd-chi-one.vercel.app",
+  "https://dnd-backend-pi.vercel.app",
 ];
 
 const allowedOrigins = Array.from(
