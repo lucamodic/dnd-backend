@@ -62,7 +62,9 @@ const corsOptions: CorsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+// Express 5 (path-to-regexp v6) does not allow bare "*" patterns.
+// Use a catch-all pattern that matches every path for preflight requests.
+app.options("/(.*)", cors(corsOptions));
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
