@@ -25,6 +25,9 @@ app.use(express.json());
 const configuredOrigins =
   process.env.CORS_ORIGINS || process.env.FRONT_URL || "";
 
+const normalizeOrigin = (origin?: string | null) =>
+  origin?.trim().replace(/\/+$/, "").toLowerCase() ?? "";
+
 const defaultOrigins = [
   "http://localhost:8080",
   "http://localhost:3000",
@@ -35,17 +38,19 @@ const defaultOrigins = [
 const allowedOrigins = Array.from(
   new Set(
     [...configuredOrigins.split(","), ...defaultOrigins]
-      .map((origin) => origin.trim())
+      .map((origin) => normalizeOrigin(origin))
       .filter(Boolean)
   )
 );
 
 const corsOptions: CorsOptions = {
   origin(origin, callback) {
+    const normalizedOrigin = normalizeOrigin(origin);
+
     if (
-      !origin ||
+      !normalizedOrigin ||
       allowedOrigins.includes("*") ||
-      allowedOrigins.includes(origin)
+      allowedOrigins.includes(normalizedOrigin)
     ) {
       return callback(null, true);
     }
@@ -57,6 +62,7 @@ const corsOptions: CorsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
